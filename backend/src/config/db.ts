@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
 
 export let isConnectedToMongo = false;
 
@@ -77,6 +78,13 @@ export async function connectDB() {
   }
 
   try {
+    // Configure reliable DNS servers to resolve MongoDB SRV records smoothly
+    try {
+      dns.setServers(['8.8.8.8', '1.1.1.1']);
+    } catch (e) {
+      // Safe fallback if environment prohibits custom DNS
+    }
+
     mongoose.set('strictQuery', true);
     await mongoose.connect(mongoUri, {
       serverSelectionTimeoutMS: 5000,
