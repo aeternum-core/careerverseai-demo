@@ -77,11 +77,11 @@ io.on('connection', (socket) => {
   socket.on('send_message', async (data) => {
     console.log(`📩 Received 'send_message' event on socket ${socket.id}. Data:`, data);
     try {
-      const { message, history } = data;
-      console.log(`💬 Processing chat message: "${message}" with history length ${history?.length || 0}`);
+      const { message, history, context } = data;
+      console.log(`💬 Processing chat message: "${message}" with context length ${context ? context.length : 0}`);
       
-      // Socket messaging triggers the mock counselor chatbot flow
-      const response = await AIService.chat([...(history || []), { role: 'user', content: message }]);
+      // Socket messaging triggers the counselor chatbot flow with student Career Twin memory
+      const response = await AIService.chat([...(history || []), { role: 'user', content: message }], context);
       console.log(`🤖 AI Chat response generated successfully: "${response.substring(0, 60)}..."`);
       
       socket.emit('receive_message', { 

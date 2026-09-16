@@ -12,4 +12,12 @@ router.post('/assessment', StudentController.submitAssessment);
 router.get('/assessment', StudentController.getAssessment);
 router.post('/xp', StudentController.awardXP);
 
+// Career Twin Intelligence Endpoints
+router.get('/career-twin', StudentController.getCareerTwin);
+router.post('/career-twin/target', StudentController.updateTargetCareer);
+router.post('/simulation/decision', StudentController.recordSimulationDecision);
+router.post('/what-if', StudentController.runWhatIf);
+router.post('/mission/complete', StudentController.completeMission);
+router.post('/skill-verify', StudentController.verifySkill);
+
 export default router;

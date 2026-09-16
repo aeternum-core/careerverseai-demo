@@ -7,7 +7,7 @@ import { MessageSquareCode, Sparkles, X, Send, Terminal, HelpCircle } from 'luci
 import GlassCard from './GlassCard';
 
 export default function AIAssistant() {
-  const { token, apiUrl } = useStore();
+  const { token, apiUrl, careerTwin, user } = useStore();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
   const [input, setInput] = useState('');
@@ -34,6 +34,21 @@ export default function AIAssistant() {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, typing]);
 
+  const getTwinContext = () => {
+    if (!careerTwin) return undefined;
+    return `
+STUDENT CAREER TWIN PROFILE:
+- Name: ${careerTwin.studentName || user?.profile?.fullName || 'Cadet'}
+- Target Career: ${careerTwin.targetCareer}
+- Career Readiness Index (CRI): ${careerTwin.readiness.current}% (Target: ${careerTwin.readiness.target}%)
+- Verified Skills: ${careerTwin.skills.map(s => `${s.name} (${s.verified}% verified, ${s.selfReported}% self-reported)`).join(', ')}
+- Behavioral Signals: Analytical Thinking (${careerTwin.behavior.analyticalThinking}%), Quality Orientation (${careerTwin.behavior.qualityOrientation}%), Risk Management (${careerTwin.behavior.riskManagement}%)
+- Top Career Fit: ${careerTwin.careerFit[0]?.role} (${careerTwin.careerFit[0]?.score}% Fit)
+- Identified Skill Gaps: ${careerTwin.careerFit[0]?.skillGaps?.join(', ') || 'None'}
+- Identified Experience Gaps: ${careerTwin.careerFit[0]?.expGaps?.join(', ') || 'None'}
+`;
+  };
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || !socketRef.current) return;
@@ -43,10 +58,11 @@ export default function AIAssistant() {
     setInput('');
     setTyping(true);
 
-    // Emit via sockets
+    // Emit via sockets with rich Career Twin memory context
     socketRef.current.emit('send_message', {
       message: input,
-      history: messages
+      history: messages,
+      context: getTwinContext()
     });
   };
 
@@ -60,7 +76,8 @@ export default function AIAssistant() {
 
     socketRef.current.emit('send_message', {
       message: promptText,
-      history: messages
+      history: messages,
+      context: getTwinContext()
     });
   };
 

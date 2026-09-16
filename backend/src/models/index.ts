@@ -147,3 +147,6 @@ export const CollegeRepository = new BaseRepository<any>(CollegeModel, 'colleges
 export const RoadmapRepository = new BaseRepository<any>(RoadmapModel, 'roadmaps');
 export const AppointmentRepository = new BaseRepository<any>(AppointmentModel, 'appointments');
 export const ChatHistoryRepository = new BaseRepository<any>(ChatHistoryModel, 'chatHistory');
+
+// Career Twin
+export * from './careerTwin.model';
