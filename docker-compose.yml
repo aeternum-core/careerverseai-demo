@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  database:
+    image: mongo:latest
+    container_name: careerverse_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - careerverse_net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: careerverse_backend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb://database:27017/careerverse
+      - JWT_SECRET=careerverse_cosmic_jwt_key_2026
+      - OPENAI_API_KEY=
+    depends_on:
+      - database
+    networks:
+      - careerverse_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: careerverse_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:5000
+    depends_on:
+      - backend
+    networks:
+      - careerverse_net
+
+volumes:
+  mongo_data:
+
+networks:
+  careerverse_net:
+    driver: bridge
